@@ -21,7 +21,14 @@ describe(Bot store,
 )
 ~~~
 
-You can symlink `premunition` to a directory in your `PATH` and run it directly: `ln -s `
+
+Usage
+-----
+Gather your munitions:
+
+    git clone --depth=1 git@github.com:jeffpeterson/premunition.git
+    cd premunition
+    ln -s "$PWD/premunition.io" ~/bin/premunition
 
 
 `premunition` recursively runs all tests matching `*test.io` anywhere in the current directory.
