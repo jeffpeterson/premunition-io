@@ -1,6 +1,7 @@
 #!/usr/bin/env io
 Premunition := nil
 
+Premunition time := Date clock
 Sequence do(
   escapedWithCode := method(code, 27 asCharacter .. "[" .. code .. "m" .. self .. 27 asCharacter .. "[0m")
   asBlack         := method(escapedWithCode(30))
@@ -18,6 +19,9 @@ Sequence do(
 Munition := Object clone do(
   focus ::= nil
   passedCount := 0
+  beforeBlock := block message
+  afterBlock  := block message
+
 
   init := method(
     setFocus = method(focus,
@@ -32,7 +36,10 @@ Munition := Object clone do(
     assertion  := call message argAt(0)
     label      := assertion label
     lineNumber := assertion lineNumber
-    if(call evalArgAt(0),
+    context    := call sender clone
+
+    context doMessage(beforeBlock)
+    if(context doMessage(assertion),
       "." asGreen print
       self proto passedCount = passedCount + 1
     ,
@@ -43,11 +50,19 @@ Munition := Object clone do(
       assertion asString asRed println
       System exit
     )
+    context doMessage(afterBlock)
+  )
+
+  before := method(
+    beforeBlock = call message argAt(0)
+  )
+
+  after := method(
+    afterBlock = call message argAt(0)
   )
 )
 
 describe := method(
-  call evalArgAt(0)
   if(call message argCount == 1) then(
     return Munition clone setFocus(call message argAt(0) name)
   ) elseif(call message argCount == 2) then(
@@ -62,5 +77,6 @@ if(isLaunchScript) then(
     doFile(file path)
   )
 
-  "\n\n#{Munition passedCount} assertions passed successfully." interpolate asGreen println
+  Premunition time = Date clock - Premunition time
+  "\n\n#{Munition passedCount} assertions passed successfully in #{Premunition time} seconds." interpolate asGreen println
 )
